@@ -35,7 +35,7 @@ private:
 public:
     static void info(std::string s, std::size_t indent = 0)
     {
-        std::cout << std::string(isTTY(std::cout) ? "\u001B[46m\u001B[37m\u001B[1m  INFO  \u001B[22m\u001B[39m\u001B[49m " : "|  INFO  | ") << logger::format(s, 9 + indent);
+        std::cout << std::string(isTTY(std::cout) ? "\u001B[44m\u001B[37m\u001B[1m  INFO  \u001B[22m\u001B[39m\u001B[49m " : "|  INFO  | ") << logger::format(s, 9 + indent);
     };
 
     static void error(std::string s, std::size_t indent = 0)
