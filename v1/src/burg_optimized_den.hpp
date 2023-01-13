@@ -94,7 +94,7 @@ public:
         T ki = 0.;                                                                                                // K at i iteration
         T num = 0.;                                                                                               // Numerator
         T err = la::prod::dot_basic(&samples.data()[samples_start], &samples.data()[samples_start], actual_size); // Error
-        T den = 2.000001 * err;                                                                                         // Denominator
+        T den = 2. * err;                                                                                         // Denominator
 
 #ifdef DEBUG
         std::stringstream ss1;
