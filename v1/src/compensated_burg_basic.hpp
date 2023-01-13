@@ -9,7 +9,7 @@
 #include <iomanip>
 #include "type_details.hpp"
 #include "logger.hpp"
-#include "la.hpp"
+#include "precise_la.hpp"
 
 template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
 class compensated_burg_basic
@@ -54,7 +54,7 @@ public:
 #endif
     }
 
-    std::vector<T> fit(std::vector<T>& samples, std::size_t order)
+    std::vector<T> fit(std::vector<T> &samples, std::size_t order)
     {
 #ifdef DEBUG
         assert(order > 0);
@@ -91,10 +91,12 @@ public:
         a[0] = 1.; // As per burg's specifications
 
         // Initialize burg methods variables
-        T ki = 0.;                                                                                                // K at i iteration
-        T num = 0.;                                                                                               // Numerator
-        T den = 0.;                                                                                               // Denominator
-        T err = la::prod::dot_basic(&samples.data()[samples_start], &samples.data()[samples_start], actual_size); // Error
+        T ki = 0.;    // K at i iteration
+        T num = 0.;   // Numerator
+        T den = 0.;   // Denominator
+        T err = 0.;   // Error
+
+        err = precise_la::utils::sum_pair_elements(precise_la::prod::dot_2(&samples.data()[samples_start], &samples.data()[samples_start], actual_size));
 
 #ifdef DEBUG
         std::stringstream ss1;
@@ -106,18 +108,22 @@ public:
         // AR main loop
         for (std::size_t i = 1; i <= actual_order; ++i)
         {
-            num = -2 * la::prod::dot_basic(&b.data()[0], &f.data()[i], actual_size - i);
-            den = la::prod::dot_basic(&f.data()[i], &f.data()[i], actual_size - i) + la::prod::dot_basic(&b.data()[0], &b.data()[0], actual_size - i);
+            // Numerator
+            num = precise_la::utils::sum_pair_elements(precise_la::prod::dot_2(&b.data()[0], &f.data()[i], actual_size - i));
+            num = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, -2.));
 
-            ki = num / den;
+            // Denominator
+            den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(precise_la::prod::dot_2(&f.data()[i], &f.data()[i], actual_size - i), precise_la::prod::dot_2(&b.data()[0], &b.data()[0], actual_size - i)));
+
+            ki = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, 1 / den));
 
             for (std::size_t j = i; j < actual_size; j++)
             {
                 T bj = b[j - i];
                 T fj = f[j];
 
-                b[j - i] = bj + ki * fj;
-                f[j] = fj + ki * bj;
+                b[j - i] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({bj, 0}, precise_la::prod::two_product_FMA(ki, fj)));
+                f[j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({fj, 0}, precise_la::prod::two_product_FMA(ki, bj)));
             }
 
             for (std::size_t j = 1; j <= i / 2; j++)
@@ -125,12 +131,12 @@ public:
                 T aj = a[j];
                 T anj = a[i - j];
 
-                a[j] = aj + ki * anj;
-                a[i - j] = anj + ki * aj;
+                a[j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({aj, 0}, precise_la::prod::two_product_FMA(ki, anj)));
+                a[i - j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({anj, 0}, precise_la::prod::two_product_FMA(ki, aj)));
             }
             a[i] = ki;
 
-            err = err * (1 - ki * ki);
+            err = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(err, precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki)))));
 
 #ifdef DEBUG
             {
@@ -184,7 +190,7 @@ public:
         return a;
     }
 
-    std::vector<T> predict(std::vector<T>& samples, std::vector<T>& a, std::size_t n)
+    std::vector<T> predict(std::vector<T> &samples, std::vector<T> &a, std::size_t n)
     {
         std::vector<T> predictions(n);
         std::vector<T> section(a.size() - 1);
@@ -196,30 +202,30 @@ public:
                 section[j - 1] = -(i - j < 0 ? static_cast<T>(samples[samples.size() + i - j]) : predictions[i - j]);
             }
 
-            predictions[i] = la::prod::dot_basic(&section.data()[0], &a.data()[1], a.size() - 1);
+            predictions[i] = precise_la::utils::sum_pair_elements(precise_la::prod::dot_2(&section.data()[0], &a.data()[1], a.size() - 1));
         }
 
-        #ifdef DEBUG
+#ifdef DEBUG
+        {
+            std::stringstream s;
+
+            s << "[" << __FUNCTION__ << "] - "
+              << "BURG's AR predicted samples: "
+              << "\n"
+              << std::setprecision(type_precision<T>()) << std::scientific
+              << "  - predicted samples: [";
+
+            for (std::size_t i = 0; i < predictions.size(); ++i)
             {
-                std::stringstream s;
-
-                s << "[" << __FUNCTION__ << "] - "
-                << "BURG's AR predicted samples: "
-                << "\n"
-                << std::setprecision(type_precision<T>()) << std::scientific
-                << "  - predicted samples: [";
-
-                for (std::size_t i = 0; i < predictions.size(); ++i)
-                {
-                    s << (i > 0 ? ", " : "") << predictions[i];
-                }
-
-                s << "]" << std::endl;
-
-                logger::info(s.str(), sizeof(__FUNCTION__) + 2);
+                s << (i > 0 ? ", " : "") << predictions[i];
             }
 
-        #endif
+            s << "]" << std::endl;
+
+            logger::info(s.str(), sizeof(__FUNCTION__) + 2);
+        }
+
+#endif
 
         return predictions;
     }
