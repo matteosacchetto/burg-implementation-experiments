@@ -61,6 +61,9 @@
         "csignal": "cpp",
         "codecvt": "cpp",
         "condition_variable": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "ranges": "cpp"
     }
 }
