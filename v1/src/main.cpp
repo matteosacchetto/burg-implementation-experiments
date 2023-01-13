@@ -1,6 +1,9 @@
 #include "burg_basic.hpp"
 #include "burg_optimized_den.hpp"
 #include "burg_optimized_den_sqrt.hpp"
+#include "compensated_burg_basic.hpp"
+#include "compensated_burg_optimized_den.hpp"
+#include "compensated_burg_optimized_den_sqrt.hpp"
 #include "timer.hpp"
 #include <algorithm>
 
@@ -8,18 +11,18 @@
 
 int main()
 {
-    burg_optimized_den<double> ar(2048);
+    compensated_burg_optimized_den_sqrt<double> ar(2048);
     std::vector<double> samples(2048);
-    for (std::size_t i = 0; i < samples.size(); ++i)
-    {
-        samples[i] = 0.1 * i;
-    }
+    // for (std::size_t i = 0; i < samples.size(); ++i)
+    // {
+    //     samples[i] = 0.1 * i;
+    // }
     measure::timer t;
 
     double sample_rate = 44100;
     double freq = 441;
     std::generate(samples.begin(), samples.end(), [sample_rate, freq, n = 0]() mutable
-                  { auto r = static_cast<double>(static_cast<int>(std::sin((n * 2 * M_PI) / (sample_rate / freq)) * 100));
+                  { auto r = std::sin((n * 2 * M_PI) / (sample_rate / freq));
                 n++;
                 return r; });
 
@@ -43,7 +46,7 @@ int main()
 #endif
 
     t.start();
-    auto a = ar.fit(samples, 16);
+    auto a = ar.fit(samples, 64);
     t.stop();
 
     {
@@ -121,6 +124,27 @@ int main()
         logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
     }
 #endif
+
+    auto max_s = std::max_element(samples.begin(), samples.end(), [](auto a, auto b) {
+        return std::fabs(a) < std::fabs(b);
+    });
+
+    auto max_p = std::max_element(pred.begin(), pred.end(), [](auto a, auto b) {
+        return std::fabs(a) < std::fabs(b);
+    });
+
+    {
+        std::stringstream ss;
+        ss << "[" << __FUNCTION__ << "] - "
+           << "Maximum (abs) values: "
+           << "\n"
+           << std::setprecision(type_precision<double>()) << std::scientific
+           << "  - samples:   " << *max_s << "\n"
+           << "  - prediction " << *max_p << std::endl;
+
+
+        logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
+    }
 
     return 0;
 }
