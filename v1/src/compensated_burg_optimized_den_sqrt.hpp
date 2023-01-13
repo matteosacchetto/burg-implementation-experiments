@@ -1,5 +1,5 @@
-#ifndef __COMPENSATED_BURG_BASIC_HPP__
-#define __COMPENSATED_BURG_BASIC_HPP__
+#ifndef __COMPENSATED_BURG_OPTIMIZED_DEN_SQRT_HPP__
+#define __COMPENSATED_BURG_OPTIMIZED_DEN_SQRT_HPP__
 
 #include <type_traits>
 #include <vector>
@@ -12,7 +12,7 @@
 #include "precise_la.hpp"
 
 template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
-class compensated_burg_basic
+class compensated_burg_optimized_den_sqrt
 {
 private:
     std::size_t max_size;
@@ -22,7 +22,7 @@ private:
     std::vector<T> b;
 
 public:
-    compensated_burg_basic(const std::size_t max_size) : max_size{max_size}, max_order{max_size - 1}, f(max_size), b(max_size)
+    compensated_burg_optimized_den_sqrt(const std::size_t max_size) : max_size{max_size}, max_order{max_size - 1}, f(max_size), b(max_size)
     {
 #ifdef DEBUG
         assert(max_size > 0);
@@ -42,7 +42,7 @@ public:
 #endif
     };
 
-    ~compensated_burg_basic()
+    ~compensated_burg_optimized_den_sqrt()
     {
 #ifdef DEBUG
         std::stringstream s;
@@ -65,6 +65,7 @@ public:
         std::size_t actual_size = std::min(samples.size(), max_size);
         std::size_t samples_start = samples.size() - actual_size;
         std::size_t actual_order = std::min(order, max_order);
+        std::size_t switching_point = std::sqrt(actual_order + 1);
 
 #ifdef DEBUG
         {
@@ -97,6 +98,7 @@ public:
         T err = 0.;   // Error
 
         err = precise_la::utils::sum_pair_elements(precise_la::prod::dot_2(&samples.data()[samples_start], &samples.data()[samples_start], actual_size));
+        den = 2. * err;
 
 #ifdef DEBUG
         std::stringstream ss1;
@@ -113,7 +115,15 @@ public:
             num = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, static_cast<T>(-2.)));
 
             // Denominator
-            den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(precise_la::prod::dot_2(&f.data()[i], &f.data()[i], actual_size - i), precise_la::prod::dot_2(&b.data()[0], &b.data()[0], actual_size - i)));
+            if(i > switching_point) {
+                auto f_2 = precise_la::prod::two_product_FMA(f[i - 1], -f[i - 1]);
+                auto b_2 = precise_la::prod::two_product_FMA(b[actual_size - i], -b[actual_size - i]);
+                auto den_1 = precise_la::prod::two_product_FMA(den, precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki))));
+                den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(den_1, precise_la::utils::sum_pairs(f_2, b_2)));
+            }
+            else {
+                den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(precise_la::prod::dot_2(&f.data()[i], &f.data()[i], actual_size - i), precise_la::prod::dot_2(&b.data()[0], &b.data()[0], actual_size - i)));
+            }
 
             ki = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, 1 / den));
 
