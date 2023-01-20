@@ -17,6 +17,14 @@ namespace utils
         return id;
     }
 
+    uint32_t little_to_big_endian(uint32_t num)
+    {
+        return (num >> 24) |
+         ((num<<8) & 0x00FF0000) |
+         ((num>>8) & 0x0000FF00) |
+         (num << 24);
+    }
+
     namespace audio
     {
         /**
