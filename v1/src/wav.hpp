@@ -3,6 +3,7 @@
 
 // Reference: http://soundfile.sapp.org/doc/WaveFormat/
 //            https://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+//            https://tech.ebu.ch/docs/tech/tech3285.pdf
 
 // Wave formats
 // int:
@@ -271,7 +272,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        samples[i * num_channels + j] = utils::audio::convert<uint8_t, T>(data[i][j]);
+                        samples[j * num_channels + i] = utils::audio::convert<uint8_t, T>(data[i][j]);
                     }
                 }
                 break;
@@ -288,7 +289,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        *((int16_t *)(&samples[i * num_channels * byte_per_sample + j * byte_per_sample])) = utils::audio::convert<int16_t, T>(data[i][j]);
+                        *((int16_t *)(&samples[j * num_channels * byte_per_sample + i * byte_per_sample])) = utils::audio::convert<int16_t, T>(data[i][j]);
                     }
                 }
                 break;
@@ -309,9 +310,9 @@ private:
                         uint8_t _low = sample & 0x000000FF;
                         uint8_t _mid = (sample & 0x0000FF00) >> 8;
                         uint8_t _high = (sample & 0x00FF0000) >> 16;
-                        samples[i * num_channels * byte_per_sample + j * byte_per_sample] = _low;
-                        samples[i * num_channels * byte_per_sample + j * byte_per_sample + 1] = _mid;
-                        samples[i * num_channels * byte_per_sample + j * byte_per_sample + 2] = _high;
+                        samples[j * num_channels * byte_per_sample + i * byte_per_sample] = _low;
+                        samples[j * num_channels * byte_per_sample + i * byte_per_sample + 1] = _mid;
+                        samples[j * num_channels * byte_per_sample + i * byte_per_sample + 2] = _high;
                     }
                 }
                 break;
@@ -328,7 +329,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        *((int32_t *)(&samples[i * num_channels * byte_per_sample + j * byte_per_sample])) = utils::audio::convert<int32_t, T>(data[i][j]);
+                        *((int32_t *)(&samples[j * num_channels * byte_per_sample + i * byte_per_sample])) = utils::audio::convert<int32_t, T>(data[i][j]);
                     }
                 }
                 break;
@@ -345,7 +346,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        *((int64_t *)(&samples[i * num_channels * byte_per_sample + j * byte_per_sample])) = utils::audio::convert<int64_t, T>(data[i][j]);
+                        *((int64_t *)(&samples[j * num_channels * byte_per_sample + i * byte_per_sample])) = utils::audio::convert<int64_t, T>(data[i][j]);
                     }
                 }
                 break;
@@ -362,7 +363,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        *((float *)(&samples[i * num_channels * byte_per_sample + j * byte_per_sample])) = utils::audio::convert<float, T>(data[i][j]);
+                        *((float *)(&samples[j * num_channels * byte_per_sample + i * byte_per_sample])) = utils::audio::convert<float, T>(data[i][j]);
                     }
                 }
                 break;
@@ -379,7 +380,7 @@ private:
                 {
                     for (std::size_t j = 0; j < data[i].size(); ++j)
                     {
-                        *((double *)(&samples[i * num_channels * byte_per_sample + j * byte_per_sample])) = utils::audio::convert<double, T>(data[i][j]);
+                        *((double *)(&samples[j * num_channels * byte_per_sample + i * byte_per_sample])) = utils::audio::convert<double, T>(data[i][j]);
                     }
                 }
                 break;
