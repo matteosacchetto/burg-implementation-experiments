@@ -603,8 +603,9 @@ private:
 public:
     std::vector<std::vector<T>> data_samples; // A matrix n_channels * samples_per_channel in the desired type
     uint32_t sample_rate;
+    sample_type_enum sample_type;
 
-    wav_file(std::string filepath) : filepath{filepath}
+    wav_file(std::string filepath) : filepath{filepath}, data_samples{}, sample_rate{44100}, sample_type{sample_type_enum::SINT24}
     {
     }
 
@@ -627,21 +628,26 @@ public:
 
         if (fmt_header.audio_format == audio_format_enum::FLOAT_DATA)
         {
-            file >> *fact_header;
+            wav_file::fact _fact_header;
+            file >> _fact_header;
+
+            fact_header = _fact_header;
         }
 
         file >> data_header;
 
         std::cout << riff_header.str();
         std::cout << fmt_header.str();
-        if (fact_header)
+        if (fact_header.has_value())
         {
             std::cout << (*fact_header).str();
         }
         std::cout << data_header.str();
 
+        sample_type = get_sample_type(fmt_header.bits_per_sample, fmt_header.audio_format == audio_format_enum::FLOAT_DATA);
+
         // Convert bytearray to vector of the desired type
-        data_samples = convert(data_header.samples, fmt_header.bits_per_sample, get_sample_type(fmt_header.bits_per_sample, fmt_header.audio_format == audio_format_enum::FLOAT_DATA), fmt_header.num_channels, fmt_header.sample_rate);
+        data_samples = convert(data_header.samples, fmt_header.bits_per_sample, sample_type, fmt_header.num_channels, fmt_header.sample_rate);
     }
 
     void write_file(const std::vector<std::vector<T>> &data, uint32_t sample_rate, sample_type_enum sample_type = sample_type_enum::SINT24)
@@ -653,13 +659,9 @@ public:
 
         wav_file::data data_header{data, sample_type};
         std::optional<wav_file::fact> fact_header{};
-        if (sample_type == sample_type_enum::FLOAT)
+        if (sample_type == sample_type_enum::FLOAT || sample_type == sample_type_enum::DOUBLE)
         {
-            *fact_header = {4};
-        }
-        else if (sample_type == sample_type_enum::DOUBLE)
-        {
-            *fact_header = {8};
+            fact_header = {static_cast<uint32_t>(data[0].size() * data.size())};
         }
 
         wav_file::fmt fmt_header{
@@ -690,7 +692,7 @@ public:
 
         // Write file
         file << riff_header << fmt_header;
-        if (fact_header)
+        if (fact_header.has_value())
         {
             file << *fact_header;
         }
