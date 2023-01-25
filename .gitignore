@@ -35,3 +35,6 @@
 build
 *.zip
 *.wav
+
+# Sample directory
+samples*
