@@ -230,7 +230,14 @@ private:
 
             if (fact_header.chunk_id != 0x74636166)
             {
-                throw std::runtime_error("fact header missing");
+                // Fact header is missing, but data may be available -> continue reading
+                fact_header.chunk_id = 0;
+                fact_header.chunk_size = 0;
+                fact_header.sample_length = 0;
+
+                in.seekg(std::streamoff(-3 * sizeof(uint32_t)), in.cur);
+                std::cerr << "fact header missing" << std::endl;
+                // throw std::runtime_error("fact header missing")
             }
 
             return in;
@@ -425,7 +432,7 @@ private:
                 // If header != data => skip its content
                 if (tmp_chunk_id != 0x61746164)
                 {
-                    std::cout << tmp_chunk_size + 8 << std::endl;
+                    std::cout << utils::uint32_to_string(tmp_chunk_id) << " " << tmp_chunk_size + 8 << std::endl;
                     for (uint32_t i = 0; i < tmp_chunk_size; ++i)
                     {
                         in.read(reinterpret_cast<char *>(&tmp_junk), sizeof(tmp_junk));
