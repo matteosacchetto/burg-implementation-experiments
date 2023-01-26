@@ -28,6 +28,7 @@
 #include <fstream>
 #include <stdexcept>
 #include "utils.hpp"
+#include "logger.hpp"
 
 enum sample_type_enum
 {
@@ -236,7 +237,7 @@ private:
                 fact_header.sample_length = 0;
 
                 in.seekg(std::streamoff(-3 * sizeof(uint32_t)), in.cur);
-                std::cerr << "fact header missing" << std::endl;
+                logger::error("fact header missing");
                 // throw std::runtime_error("fact header missing")
             }
 
@@ -432,7 +433,14 @@ private:
                 // If header != data => skip its content
                 if (tmp_chunk_id != 0x61746164)
                 {
-                    std::cout << utils::uint32_to_string(tmp_chunk_id) << " " << tmp_chunk_size + 8 << std::endl;
+#ifdef DEBUG
+                    {
+                        std::stringstream ss;
+                        ss << utils::uint32_to_string(tmp_chunk_id) << " " << tmp_chunk_size + 8 << " (discarded)";
+
+                        logger::warning(ss.str());
+                    }
+#endif
                     for (uint32_t i = 0; i < tmp_chunk_size; ++i)
                     {
                         in.read(reinterpret_cast<char *>(&tmp_junk), sizeof(tmp_junk));
@@ -643,13 +651,20 @@ public:
 
         file >> data_header;
 
-        std::cout << riff_header.str();
-        std::cout << fmt_header.str();
-        if (fact_header.has_value())
+#ifdef DEBUG
         {
-            std::cout << (*fact_header).str();
+            std::stringstream ss;
+            ss << riff_header.str();
+            ss << fmt_header.str();
+            if (fact_header.has_value())
+            {
+                ss << (*fact_header).str();
+            }
+            ss << data_header.str();
+
+            logger::info(ss.str());
         }
-        std::cout << data_header.str();
+#endif
 
         sample_type = get_sample_type(fmt_header.bits_per_sample, fmt_header.audio_format == audio_format_enum::FLOAT_DATA);
 
@@ -686,6 +701,7 @@ public:
             fmt_header.chunk_size + 8u +
             4u};
 
+#ifdef DEBUG
         std::cout
             << data_header.str();
         if (fact_header)
@@ -696,6 +712,7 @@ public:
             << fmt_header.str();
 
         std::cout << riff_header.str();
+#endif
 
         // Write file
         file << riff_header << fmt_header;
