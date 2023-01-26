@@ -33,24 +33,24 @@ private:
     }
 
 public:
-    static void info(std::string s, std::size_t indent = 0)
+    static inline void info(const std::string& s, std::size_t indent = 0)
     {
-        std::cout << std::string(isTTY(std::cout) ? "\u001B[44m\u001B[37m\u001B[1m  INFO  \u001B[22m\u001B[39m\u001B[49m " : "|  INFO  | ") << logger::format(s, 9 + indent);
+        std::cout << std::string(isTTY(std::cout) ? "\u001B[44m\u001B[37m\u001B[1m  INFO  \u001B[22m\u001B[39m\u001B[49m " : "|  INFO  | ") << logger::format(s, 9 + indent + (isTTY(std::cout) ? 0 : 2));
     };
 
-    static void error(std::string s, std::size_t indent = 0)
+    static inline  void error(const std::string& s, std::size_t indent = 0)
     {
-        std::cout << std::string(isTTY(std::cout) ? "\u001B[41m\u001B[37m\u001B[1m  ERROR  \u001B[22m\u001B[39m\u001B[49m " : "|  ERROR  | ") << logger::format(s, 10 + indent);
+        std::cout << std::string(isTTY(std::cout) ? "\u001B[41m\u001B[37m\u001B[1m  ERROR  \u001B[22m\u001B[39m\u001B[49m " : "|  ERROR  | ") << logger::format(s, 10 + indent + (isTTY(std::cout) ? 0 : 2));
     };
 
-    static void warning(std::string s, std::size_t indent = 0)
+    static inline  void warning(const std::string& s, std::size_t indent = 0)
     {
-        std::cout << std::string(isTTY(std::cout) ? "\u001B[43m\u001B[30m\u001B[1m  WARN  \u001B[22m\u001B[39m\u001B[49m " : "|  WARN  | ") << logger::format(s, 9 + indent);
+        std::cout << std::string(isTTY(std::cout) ? "\u001B[43m\u001B[30m\u001B[1m  WARN  \u001B[22m\u001B[39m\u001B[49m " : "|  WARN  | ") << logger::format(s, 9 + indent + (isTTY(std::cout) ? 0 : 2));
     };
 
-    static void success(std::string s, std::size_t indent = 0)
+    static inline  void success(const std::string& s, std::size_t indent = 0)
     {
-        std::cout << std::string(isTTY(std::cout) ? "\u001B[42m\u001B[37m\u001B[1m  SUCCESS  \u001B[22m\u001B[39m\u001B[49m " : "|  SUCCESS  | ") << logger::format(s, 12 + indent);
+        std::cout << std::string(isTTY(std::cout) ? "\u001B[42m\u001B[37m\u001B[1m  SUCCESS  \u001B[22m\u001B[39m\u001B[49m " : "|  SUCCESS  | ") << logger::format(s, 12 + indent + (isTTY(std::cout) ? 0 : 2));
     };
 };
 
