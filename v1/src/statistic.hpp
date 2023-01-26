@@ -61,7 +61,7 @@ namespace stats
         return generated_numbers;
     }
 
-    template <typename T>
+    template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
     T mae(const std::vector<T> &v1, const std::vector<T> &v2)
     {
         std::size_t n = v1.size();
@@ -74,7 +74,7 @@ namespace stats
         return res / n;
     }
 
-    template <typename T>
+    template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
     T rmse(const std::vector<T> &v1, const std::vector<T> &v2)
     {
         std::size_t n = v1.size();
