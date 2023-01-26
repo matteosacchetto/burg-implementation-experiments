@@ -25,6 +25,33 @@ namespace utils
          (num << 24);
     }
 
+    namespace string {
+        bool ends_with(const std::string& s1, const std::string& s2) {
+            if (s1.length() < s2.length()) {
+                return false;
+            }
+            return s1.compare(s1.length() - s2.length(), s2.length(), s2) == 0;
+        }
+    }
+
+    namespace io {
+        template<typename T>
+        std::string vector_to_string(const std::vector<T>& v) {
+            std::stringstream ss;
+
+            ss << "[";
+            for(auto it = v.cbegin(); it != v.cend(); ++it) {
+                ss << *it;
+                if(std::next(it) != v.cend()) {
+                    ss << ",";
+                }
+            }
+            ss << "]";
+
+            return ss.str();
+        }
+    }
+
     namespace audio
     {
         /**
