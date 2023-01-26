@@ -37,14 +37,16 @@ if (filtered_list.length === 0) {
   console.log('No file to process...');
 }
 else {
-  console.log(`${filtered_list.length} file to process`);
+  let i = 0;
   for (const el of filtered_list) {
     await ffmpeg(el, {
       sr,
       num_channels,
       sample_fmt,
       remove_src_file
-    });
+    }) && i++;
   }
+
+  console.log(`${i} file processed`);
 }
 

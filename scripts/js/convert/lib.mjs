@@ -48,28 +48,32 @@ export const ffmpeg = async (
     remove_src_file = false,
   } = {}
 ) => {
+  if (file.split('.')[0].endsWith(`_${sr}_${num_channels}`)) {
+    return false;
+  }
+
   const spinner = ora(`${chalk.bold(file)}`);
   try {
-    if (file.split('.')[0].endsWith(`_${sr}_${num_channels}`)) {
-      spinner.succeed(`${chalk.gray(file)} ${chalk.gray(`[SKIPPED]`)}`);
-      return;
-    }
-
     const output_file = `${file.split('.')[0]}_${sr}_${num_channels}.wav`;
 
     if (existsSync(output_file)) {
       if (remove_src_file) {
-        spinner.succeed(`${chalk.gray(file)} 🠒 ${chalk.bold.cyan(output_file)}`);
+        spinner.succeed(
+          `${chalk.gray(file)} 🠒 ${chalk.bold.cyan(output_file)}`
+        );
       } else {
-        spinner.succeed(`${chalk.gray(file)} ${chalk.gray(`[SKIPPED]`)}`);
+        // spinner.succeed(`${chalk.gray(file)} ${chalk.gray(`[SKIPPED]`)}`);
+        return false;
       }
     } else {
       await exec(
         `ffmpeg -i ${file} -ar ${sr} -ac ${num_channels} -sample_fmt ${sample_fmt} -y ${output_file}`
       );
-      
+
       if (remove_src_file) {
-        spinner.succeed(`${chalk.gray(file)} 🠒 ${chalk.bold.cyan(output_file)}`);
+        spinner.succeed(
+          `${chalk.gray(file)} 🠒 ${chalk.bold.cyan(output_file)}`
+        );
       } else {
         spinner.succeed(`${chalk.bold.cyan(file)}`);
       }
@@ -78,8 +82,12 @@ export const ffmpeg = async (
     if (remove_src_file) {
       await rm(file);
     }
+
+    return true;
   } catch (e) {
     spinner.fail();
     console.error(e);
   }
+
+  return false;
 };
