@@ -43,7 +43,7 @@ int main()
                 std::string processed_filepath = utils::string::change_first_dir(entry.path(), "samples-convert-processed");
 
                 logger::info(filepath);
-                logger::info(processed_filepath);
+                // logger::info(processed_filepath);
 
                 wav_file<data_type> wav{filepath};
                 wav.read_file();
@@ -53,8 +53,9 @@ int main()
 
                 std::vector<uint64_t> positions = stats::get_n_positions<uint64_t>(*std::max_element(train_sizes.begin(), train_sizes.end()), samples.size() - test_size, num_positions, test_size);
 
+#ifdef PRINT
                 logger::info(utils::io::vector_to_string(positions));
-
+#endif
                 nlohmann::ordered_json result = {
                     {"file", filepath},
                     {"results", std::vector<nlohmann::ordered_json>()},
