@@ -75,7 +75,7 @@ namespace stats
     }
 
     template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
-    T rmse(const std::vector<T> &v1, const std::vector<T> &v2)
+    T rmse(const std::vector<T> &v1, const std::vector<T> &v2, bool squared = false)
     {
         std::size_t n = v1.size();
         T res{};
@@ -84,7 +84,7 @@ namespace stats
             res += std::pow((v2[i] - v1[i]), 2);
         }
 
-        return std::sqrt(res / n);
+        return squared ? res / n : std::sqrt(res / n);
     }
 }
 
