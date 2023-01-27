@@ -3,7 +3,8 @@
 
 #include <string>
 #include <type_traits>
-
+#include <algorithm>
+#include <filesystem>
 namespace utils
 {
     std::string uint32_to_string(uint32_t num)
@@ -20,29 +21,71 @@ namespace utils
     uint32_t little_to_big_endian(uint32_t num)
     {
         return (num >> 24) |
-         ((num<<8) & 0x00FF0000) |
-         ((num>>8) & 0x0000FF00) |
-         (num << 24);
+               ((num << 8) & 0x00FF0000) |
+               ((num >> 8) & 0x0000FF00) |
+               (num << 24);
     }
 
-    namespace string {
-        bool ends_with(const std::string& s1, const std::string& s2) {
-            if (s1.length() < s2.length()) {
+    namespace string
+    {
+        bool ends_with(const std::string &s1, const std::string &s2)
+        {
+            if (s1.length() < s2.length())
+            {
                 return false;
             }
             return s1.compare(s1.length() - s2.length(), s2.length(), s2) == 0;
         }
+
+        inline const std::string tolower(const std::string &s)
+        {
+            std::string r(s);
+            std::transform(r.begin(), r.end(), r.begin(), [](unsigned char c) { return std::tolower(c); });
+            return r;
+        }
+
+        inline const std::string change_first_dir(const std::string& filepath, const std::string& new_first_dir)
+        {
+            std::stringstream input(filepath);
+            std::stringstream output;
+            std::string segment;
+            std::vector<std::string> seglist;
+
+            while(std::getline(input, segment, std::filesystem::path::preferred_separator))
+            {
+                seglist.push_back(segment);
+            }
+            if(seglist.size() == 0)
+            {
+                return filepath;
+            }
+
+            seglist[0] = new_first_dir;
+
+            for(std::size_t i = 0; i<seglist.size(); ++i)
+            {
+                output << seglist[i];
+                if(i < seglist.size() - 1)
+                    output << std::filesystem::path::preferred_separator;
+            }
+
+            return output.str();
+        }
     }
 
-    namespace io {
-        template<typename T>
-        std::string vector_to_string(const std::vector<T>& v) {
+    namespace io
+    {
+        template <typename T>
+        std::string vector_to_string(const std::vector<T> &v)
+        {
             std::stringstream ss;
 
             ss << "[";
-            for(auto it = v.cbegin(); it != v.cend(); ++it) {
+            for (auto it = v.cbegin(); it != v.cend(); ++it)
+            {
                 ss << *it;
-                if(std::next(it) != v.cend()) {
+                if (std::next(it) != v.cend())
+                {
                     ss << ",";
                 }
             }
