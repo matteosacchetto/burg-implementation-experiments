@@ -143,14 +143,14 @@ int main()
                 std::cout << index << "," << std::string(result["file"]) << "," << result["results"].dump() << "," << result["b0"].dump() << "," << result["b1"].dump() << std::endl;
                 index++;
 
-                const auto processed_path = std::filesystem::path(processed_filepath);
-                if (!processed_path.parent_path().empty())
-                {
-                    std::filesystem::create_directories(processed_path.parent_path());
-                }
+                // const auto processed_path = std::filesystem::path(processed_filepath);
+                // if (!processed_path.parent_path().empty())
+                // {
+                //     std::filesystem::create_directories(processed_path.parent_path());
+                // }
 
-                wav_file<double> processed_wav{processed_filepath};
-                processed_wav.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
+                // wav_file<double> processed_wav{processed_filepath};
+                // processed_wav.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
             }
         }
 
