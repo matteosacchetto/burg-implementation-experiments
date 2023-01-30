@@ -7,19 +7,40 @@ project(burg VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set common C++ flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+# Set default build type to release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+# Enable fast math
+if(NATIVE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
+
+# Enable fast math
+if(FAST_MATH)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
+endif()
+
+# Enable achitecture based flags
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64") # Linux
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") # Raspberry Pi
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mtune=cortex-a72")
+endif()
 
 # Build type
 message("-- ${CMAKE_BUILD_TYPE} build")
 message("-- ${CMAKE_SYSTEM_PROCESSOR} architecture")
+message("-- ${CMAKE_SYSTEM_NAME}")
+message("-- ${CMAKE_CXX_COMPILER}${CMAKE_CXX_FLAGS}")
 
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
   add_definitions(-DDEBUG)
 endif()
 
 # Activate warnings
-if (MSVC)
+if(MSVC)
   # Warning level 4
   add_compile_options(/W4)
 else()
