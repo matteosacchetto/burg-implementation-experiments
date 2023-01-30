@@ -16,6 +16,7 @@
 #include <nlohmann/json.hpp>
 
 // #define PRINT
+// #define SAVE_FILE
 
 using data_type = double;
 using ar = burg_basic<data_type>;
@@ -32,7 +33,6 @@ int main()
         // seed rand
         stats::initialize_random(1);
 
-        // nlohmann::ordered_json results = nlohmann::ordered_json::array();
         uint64_t index{};
 
         for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert"))
@@ -40,10 +40,15 @@ int main()
             if (entry.is_regular_file() && utils::string::tolower(entry.path().extension()).compare(".wav") == 0)
             {
                 const std::string filepath = entry.path();
+#ifdef SAVE_FILE
                 std::string processed_filepath = utils::string::change_first_dir(entry.path(), "samples-convert-processed");
+#endif
 
                 logger::info(filepath);
-                // logger::info(processed_filepath);
+
+#ifdef SAVE_FILE
+                logger::info(processed_filepath);
+#endif
 
                 wav_file<data_type> wav{filepath};
                 wav.read_file();
@@ -144,158 +149,22 @@ int main()
                 std::cout << index << "," << std::string(result["file"]) << "," << result["results"].dump() << "," << result["b0"].dump() << "," << result["b1"].dump() << std::endl;
                 index++;
 
-                // const auto processed_path = std::filesystem::path(processed_filepath);
-                // if (!processed_path.parent_path().empty())
-                // {
-                //     std::filesystem::create_directories(processed_path.parent_path());
-                // }
+#ifdef SAVE_FILE
+                const auto processed_path = std::filesystem::path(processed_filepath);
+                if (!processed_path.parent_path().empty())
+                {
+                    std::filesystem::create_directories(processed_path.parent_path());
+                }
 
-                // wav_file<double> processed_wav{processed_filepath};
-                // processed_wav.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
+                wav_file<double> processed_wav{processed_filepath};
+                processed_wav.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
+#endif
             }
         }
-
-        // Write output file
-        // wav_file<double> wav1{"a1.wav"};
-        // wav1.write_file(std::vector<std::vector<double>>{samples}, wav.sample_rate, sample_type_enum::FLOAT);
     }
     catch (std::exception &e)
     {
         std::cout << e.what() << std::endl;
     }
-    //     compensated_burg_optimized_den_sqrt<double> ar(2048);
-    //     std::vector<double> samples(2048);
-    //     // for (std::size_t i = 0; i < samples.size(); ++i)
-    //     // {
-    //     //     samples[i] = 0.1 * i;
-    //     // }
-    //     measure::timer t;
-
-    //     double sample_rate = 44100;
-    //     double freq = 441;
-    //     std::generate(samples.begin(), samples.end(), [sample_rate, freq, n = 0]() mutable
-    //                   { auto r = std::sin((n * 2 * M_PI) / (sample_rate / freq));
-    //                 n++;
-    //                 return r; });
-
-    // #ifdef PRINT
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "Samples: "
-    //            << "\n"
-    //            << std::setprecision(type_precision<double>()) << std::scientific
-    //            << "  - samples: [";
-    //         for (std::size_t i = 0; i < samples.size(); ++i)
-    //         {
-    //             ss << (i > 0 ? ", " : "") << samples[i];
-    //         }
-
-    //         ss << "]" << std::endl;
-
-    //         logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
-    //     }
-    // #endif
-
-    //     t.start();
-    //     auto a = ar.fit(samples, 64);
-    //     t.stop();
-
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "Duration [fit]: " << t.get_duration_in_ns() << " ns";
-
-    //         if (t.get_duration_in_ns() > 2000000)
-    //         {
-    //             ss << " [TOO SLOW, since > 2ms]" << std::endl;
-    //             logger::warning(ss.str());
-    //         }
-    //         else
-    //         {
-    //             ss << std::endl;
-    //             logger::info(ss.str());
-    //         }
-    //     }
-
-    // #ifdef PRINT
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "BURG's AR fitted params: "
-    //            << "\n"
-    //            << std::setprecision(type_precision<double>()) << std::scientific
-    //            << "  - A coefficients: [";
-    //         for (std::size_t i = 0; i < a.size(); ++i)
-    //         {
-    //             ss << (i > 0 ? ", " : "") << a[i];
-    //         }
-
-    //         ss << "]" << std::endl;
-
-    //         logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
-    //     }
-    // #endif
-
-    //     t.start();
-    //     auto pred = ar.predict(samples, a, 2048);
-    //     t.stop();
-
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "Duration [predict]: " << t.get_duration_in_ns() << " ns";
-
-    //         if (t.get_duration_in_ns() > 2000000)
-    //         {
-    //             ss << " [TOO SLOW, since > 2ms]" << std::endl;
-    //             logger::warning(ss.str());
-    //         }
-    //         else
-    //         {
-    //             ss << std::endl;
-    //             logger::info(ss.str());
-    //         }
-    //     }
-
-    // #ifdef PRINT
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "BURG's predicted elements: "
-    //            << "\n"
-    //            << std::setprecision(type_precision<double>()) << std::scientific
-    //            << "  - predicted elements: [";
-    //         for (std::size_t i = 0; i < pred.size(); ++i)
-    //         {
-    //             ss << (i > 0 ? ", " : "") << pred[i];
-    //         }
-
-    //         ss << "]" << std::endl;
-
-    //         logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
-    //     }
-    // #endif
-
-    //     auto max_s = std::max_element(samples.begin(), samples.end(), [](auto a, auto b) {
-    //         return std::fabs(a) < std::fabs(b);
-    //     });
-
-    //     auto max_p = std::max_element(pred.begin(), pred.end(), [](auto a, auto b) {
-    //         return std::fabs(a) < std::fabs(b);
-    //     });
-
-    //     {
-    //         std::stringstream ss;
-    //         ss << "[" << __FUNCTION__ << "] - "
-    //            << "Maximum (abs) values: "
-    //            << "\n"
-    //            << std::setprecision(type_precision<double>()) << std::scientific
-    //            << "  - samples:   " << *max_s << "\n"
-    //            << "  - prediction " << *max_p << std::endl;
-
-    //         logger::info(ss.str(), sizeof(__FUNCTION__) + 2);
-    //     }
-
     return 0;
 }
