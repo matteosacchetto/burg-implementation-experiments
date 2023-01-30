@@ -19,7 +19,22 @@
 // #define SAVE_FILE
 
 using data_type = double;
+
+#if defined(BURG_BASIC)
 using ar = burg_basic<data_type>;
+#elif defined(BURG_OPT_DEN)
+using ar = burg_optimized_den<data_type>;
+#elif defined(BURG_OPT_DEN_SQRT)
+using ar = burg_optimized_den_sqrt<data_type>;
+#elif defined(BURG_COMP_BASIC)
+using ar = compensated_burg_basic<data_type>;
+#elif defined(BURG_COMP_OPT_DEN)
+using ar = compensated_burg_optimized_den<data_type>;
+#elif defined(BURG_COMP_OPT_DEN_SQRT)
+using ar = compensated_burg_optimized_den_sqrt<data_type>;
+#else
+using ar = burg_basic<data_type>;
+#endif
 
 int main()
 {
