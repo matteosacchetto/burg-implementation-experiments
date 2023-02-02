@@ -119,6 +119,10 @@ public:
             auto den_1 = precise_la::prod::two_product_FMA(den, precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki))));
             den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(den_1, precise_la::utils::sum_pairs(f_2, b_2)));
 
+            if(den == 0) {
+                den = std::numeric_limits<T>::epsilon();
+            }
+
             ki = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, 1 / den));
 
             for (std::size_t j = i; j < actual_size; j++)

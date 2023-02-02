@@ -109,6 +109,10 @@ public:
             num = -2 * la::prod::dot_basic(&b.data()[0], &f.data()[i], actual_size - i);
             den = la::prod::dot_basic(&f.data()[i], &f.data()[i], actual_size - i) + la::prod::dot_basic(&b.data()[0], &b.data()[0], actual_size - i);
 
+            if(den == 0) {
+                den = std::numeric_limits<T>::epsilon();
+            }
+
             ki = num / den;
 
             for (std::size_t j = i; j < actual_size; j++)

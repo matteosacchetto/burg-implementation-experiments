@@ -114,6 +114,10 @@ public:
                       ? (1 - ki * ki) * den - f[i - 1] * f[i - 1] - b[actual_size - i] * b[actual_size - i] // Use optimized version
                       : la::prod::dot_basic(&f.data()[i], &f.data()[i], actual_size - i) + la::prod::dot_basic(&b.data()[0], &b.data()[0], actual_size - i); // Use traditional version
 
+            if(den == 0) {
+                den = std::numeric_limits<T>::epsilon();
+            }
+
             ki = num / den;
 
             for (std::size_t j = i; j < actual_size; j++)

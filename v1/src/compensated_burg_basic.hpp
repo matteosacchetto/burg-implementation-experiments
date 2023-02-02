@@ -115,6 +115,10 @@ public:
             // Denominator
             den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(precise_la::prod::dot_2(&f.data()[i], &f.data()[i], actual_size - i), precise_la::prod::dot_2(&b.data()[0], &b.data()[0], actual_size - i)));
 
+            if(den == 0) {
+                den = std::numeric_limits<T>::epsilon();
+            }
+
             ki = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(num, 1 / den));
 
             for (std::size_t j = i; j < actual_size; j++)
