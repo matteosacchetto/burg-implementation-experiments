@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <filesystem>
+#include <regex>
 #include <nlohmann/json.hpp>
 
 // #define PRINT
@@ -161,7 +162,7 @@ int main()
                     std::cout << ",file,results,b0,b1" << std::endl;
                 }
 
-                std::cout << index << "," << std::string(result["file"]) << "," << result["results"].dump() << "," << result["b0"].dump() << "," << result["b1"].dump() << std::endl;
+                std::cout << index << "," << std::string(result["file"]) << "," << "\"" << std::regex_replace(result["results"].dump(), std::regex("\""), "\'") << "\"" << "," <<  "\"" << std::regex_replace(result["b0"].dump(), std::regex("\""), "\'") << "\"" << "," << "\"" << std::regex_replace(result["b1"].dump(), std::regex("\""), "\'") << "\"" << std::endl;
                 index++;
 
 #ifdef SAVE_FILE
