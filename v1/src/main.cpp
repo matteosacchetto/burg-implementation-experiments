@@ -180,7 +180,7 @@ int main()
     }
     catch (std::exception &e)
     {
-        std::cout << e.what() << std::endl;
+        logger::error(e.what());
     }
     return 0;
 }
