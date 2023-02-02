@@ -40,7 +40,7 @@ public:
 
     static inline  void error(const std::string& s, std::size_t indent = 0)
     {
-        std::cerr << std::string(isTTY(std::cerr) ? "\u001B[41m\u001B[37m\u001B[1m  ERROR  \u001B[22m\u001B[39m\u001B[49m " : "|  ERROR  | ") << logger::format(s, 10 + indent + (isTTY(std::cerr) ? 0 : 2));
+        std::cerr << std::string(isTTY(std::cerr) ? "\u001B[41m\u001B[37m\u001B[1m  ERR   \u001B[22m\u001B[39m\u001B[49m " : "|  ERROR  | ") << logger::format(s, 10 + indent + (isTTY(std::cerr) ? 0 : 2));
     };
 
     static inline  void warning(const std::string& s, std::size_t indent = 0)
@@ -50,7 +50,7 @@ public:
 
     static inline  void success(const std::string& s, std::size_t indent = 0)
     {
-        std::cerr << std::string(isTTY(std::cerr) ? "\u001B[42m\u001B[37m\u001B[1m  SUCCESS  \u001B[22m\u001B[39m\u001B[49m " : "|  SUCCESS  | ") << logger::format(s, 12 + indent + (isTTY(std::cerr) ? 0 : 2));
+        std::cerr << std::string(isTTY(std::cerr) ? "\u001B[42m\u001B[37m\u001B[1m  SUCC  \u001B[22m\u001B[39m\u001B[49m " : "|  SUCCESS  | ") << logger::format(s, 12 + indent + (isTTY(std::cerr) ? 0 : 2));
     };
 };
 
