@@ -19,7 +19,13 @@
 // #define PRINT
 // #define SAVE_FILE
 
+#if defined(USE_DOUBLE)
 using data_type = double;
+#elif defined(USE_LONG_DOUBLE)
+using data_type = long double;
+#else
+using data_type = double;
+#endif
 
 #if defined(BURG_BASIC)
 using ar = burg_basic<data_type>;

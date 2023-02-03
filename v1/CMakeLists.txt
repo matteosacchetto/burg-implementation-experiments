@@ -52,9 +52,20 @@ include(FetchContent)
 
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_GetProperties(json)
+
 if(NOT json_POPULATED)
   FetchContent_Populate(json)
   add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR})
+endif()
+
+if(DATA_TYPE STREQUAL "DOUBLE")
+  message("-- Using data-type=double")
+  add_definitions(-DUSE_DOUBLE)
+elseif(DATA_TYPE STREQUAL "LONG_DOUBLE")
+  message("-- Using data-type=long double")
+  add_definitions(-DUSE_LONG_DOUBLE)
+else()
+  message("-- Using data-type=double")
 endif()
 
 # Compilation definitions
