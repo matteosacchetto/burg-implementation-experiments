@@ -168,7 +168,12 @@ int main()
                     std::cout << ",file,results,b0,b1" << std::endl;
                 }
 
-                std::cout << index << "," << std::string(result["file"]) << "," << "\"" << std::regex_replace(result["results"].dump(), std::regex("\""), "\'") << "\"" << "," <<  "\"" << std::regex_replace(result["b0"].dump(), std::regex("\""), "\'") << "\"" << "," << "\"" << std::regex_replace(result["b1"].dump(), std::regex("\""), "\'") << "\"" << std::endl;
+                std::cout << index << "," << std::string(result["file"]) << ","
+                          << "\"" << std::regex_replace(result["results"].dump(), std::regex("\""), "\'") << "\""
+                          << ","
+                          << "\"" << std::regex_replace(result["b0"].dump(), std::regex("\""), "\'") << "\""
+                          << ","
+                          << "\"" << std::regex_replace(result["b1"].dump(), std::regex("\""), "\'") << "\"" << std::endl;
                 index++;
 
 #ifdef SAVE_FILE
