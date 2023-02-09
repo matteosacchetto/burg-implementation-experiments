@@ -13,7 +13,7 @@ program.addOption(
 );
 program.parse();
 
-const { output, dataType } = program.opts();
+let { output, dataType } = program.opts();
 
 if (output) await mkdir(output, { recursive: true });
 else output = '.';
