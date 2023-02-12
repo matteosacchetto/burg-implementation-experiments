@@ -46,7 +46,7 @@ int main()
 {
     try
     {
-        uint32_t test_size = 8192;
+        uint32_t test_size = 128*20;
         std::vector<uint32_t> train_sizes{512, 1024, 2048, 4096, 8192};
         std::vector<uint32_t> lag_values{1, 2, 4, 8, 16, 32, 64, 128};
 
@@ -54,7 +54,7 @@ int main()
         uint32_t pos = max_train_size; // Have each model predict starting from the same position
         uint64_t size = max_train_size + test_size;
 
-        data_type frequency = 441;
+        data_type frequency = 2205;
         data_type sample_rate = 44100;
         std::vector<data_type> samples(size);
 
