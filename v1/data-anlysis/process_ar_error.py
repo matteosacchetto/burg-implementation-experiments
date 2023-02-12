@@ -10,8 +10,10 @@ from os import path, makedirs, walk
 import time
 import json
 import gc
+import numpy
 
 show_flag = False
+data_type = numpy.double
 
 def process_file(filepath: str):
     algo = '-'.join(path.splitext(path.basename(filepath))[0].split('-')[0:-1])
@@ -25,12 +27,15 @@ def process_file(filepath: str):
         for el in data:
             train_size = el['train_size']
             order = el['lag']
-            ar_ae = list(filter(lambda x: x != None, el['ar_ae'])) # Absolute errors
-            ar_predictions = list(filter(lambda x: x!=None, el['prediction'])) # Actual predictions
+            ar_ae = numpy.array(list(filter(lambda x: x != None, el['ar_ae'])), dtype=data_type) # Absolute errors
+            ar_predictions = numpy.array(list(filter(lambda x: x!=None, el['prediction'])), dtype=data_type) # Actual predictions
+
+            print(len(ar_ae))
 
             pyplot.rc('font', size=16)
             pyplot.figure(figsize=(10, 6))
-            pyplot.plot(range(len(ar_predictions)), ar_predictions);
+            pyplot.plot(range(len(ar_predictions)), ar_predictions)
+            pyplot.ylim(-1.5, 1.5)
             pyplot.title(f'{algo} {train_size}-{order}', pad=20)  # Title
 
             pyplot.gcf().set_tight_layout(True)  # Make sure that text is not cut out
