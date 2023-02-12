@@ -92,11 +92,11 @@ else()
 endif()
 
 # [[ Build executable ]]
-# Sources
-file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-
 # Add the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} src/main.cpp src/timer.cpp src/tty.cpp)
+add_executable(${PROJECT_NAME}-error src/main-error.cpp src/timer.cpp src/tty.cpp)
+
 
 # Link additional libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME}-error PRIVATE nlohmann_json::nlohmann_json)
