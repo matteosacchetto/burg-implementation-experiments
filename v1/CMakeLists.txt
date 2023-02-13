@@ -57,6 +57,7 @@ if(NOT json_POPULATED)
   FetchContent_Populate(json)
   add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR})
 endif()
+include_directories(${json_SOURCE_DIR}/include)
 
 if(DATA_TYPE STREQUAL "DOUBLE")
   message("-- Using data-type=double")
