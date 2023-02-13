@@ -62,6 +62,19 @@ namespace stats
     }
 
     template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
+    std::vector<T> ae(const std::vector<T> &v1, const std::vector<T> &v2)
+    {
+        std::size_t n = v1.size();
+        std::vector<T> res(n);
+        for (std::size_t i = 0; i < n; i++)
+        {
+            res[i] = std::abs(v2[i] - v1[i]);
+        }
+
+        return res;
+    }
+
+    template <typename T, std::enable_if_t<true == std::is_floating_point<T>(), bool> = true>
     T mae(const std::vector<T> &v1, const std::vector<T> &v2)
     {
         std::size_t n = v1.size();
