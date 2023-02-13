@@ -18,7 +18,7 @@ const errorCommand = createCommand(name, description)
   );
 
 errorCommand.action(async (options) => {
-  const { output, dataType } = options;
+  let { output, dataType } = options;
 
   if (output) await mkdir(output, { recursive: true });
   else output = ".";
