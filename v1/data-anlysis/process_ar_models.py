@@ -3,7 +3,7 @@
 import config
 import statistics
 import utils
-from matplotlib import pyplot
+from matplotlib import pyplot, use
 import pandas
 from math import sqrt
 from os import path, makedirs, walk
@@ -19,6 +19,9 @@ legend_category = 'violin'
 
 def process_file(csv_filepath: str):
     csv_filename = path.splitext(path.basename(csv_filepath))[0]
+
+    if not show_flag:
+        use('Agg') # Non interactive mode of matplotlib to free memory
     
     # Read csv
     df = pandas.read_csv(csv_filepath)
@@ -285,10 +288,10 @@ def process_file(csv_filepath: str):
             pyplot.xlabel('Lags', labelpad=10)
             pyplot.ylabel('MAE', labelpad=10)
 
-        pyplot.title(f'{category} - MAE', pad=20)  # Title
+        pyplot.title(f'{category.capitalize()} - MAE', pad=20)  # Title
         # Show legend only if the category is
         if category == legend_category:
-            pyplot.legend(loc='upper left')  # Show legend
+            pyplot.legend(loc='upper right')  # Show legend
         if category in group1_categories:
             pyplot.ylim(0, 0.25)
         else:
@@ -333,10 +336,10 @@ def process_file(csv_filepath: str):
             pyplot.xlabel('Lags', labelpad=10)
             pyplot.ylabel('RMSE', labelpad=10)
 
-        pyplot.title(f'{category} - RMSE', pad=20)  # Title
+        pyplot.title(f'{category.capitalize()} - RMSE', pad=20)  # Title
         # Show legend only if the category is
         if category == legend_category:
-            pyplot.legend(loc='upper left')  # Show legend
+            pyplot.legend(loc='upper right')  # Show legend
         if category in group1_categories:
             pyplot.ylim(0, 0.3)
         else:
@@ -411,7 +414,7 @@ def process_file(csv_filepath: str):
 
 
 if __name__ == '__main__':
-    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2023-02-02"), topdown=True):
+    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2023-02-21_double"), topdown=True):
         for name in files:
             filepath = path.join(root, name)
             print(path.relpath(filepath, path.abspath('.')))
