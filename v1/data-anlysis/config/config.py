@@ -5,3 +5,5 @@ ROOT_DIR = path.abspath(path.join(path.dirname(path.abspath(__file__)), '..', '.
 PLOT_DIR = path.join(ROOT_DIR, 'plots')
 
 AR_MODEL_PLOT_DIRECTORY = path.join(PLOT_DIR, 'ar')
+
+TIME_STATS_DIR = path.join(ROOT_DIR, 'time_stats')
