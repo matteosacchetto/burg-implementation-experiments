@@ -16,7 +16,7 @@ show_multiplier_wrt_512_1 = False
 
 
 def get_algo(file_path: str):
-    return '-'.join(path.splitext(path.basename(name))[0].split('-')[0:-1])
+    return '-'.join(path.splitext(path.basename(file_path))[0].split('-')[0:-1])
 
 
 def process_file(csv_filepath: str):
