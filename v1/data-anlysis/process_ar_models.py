@@ -14,7 +14,6 @@ specific_train_sizes = []  # [2048, 4096, 8192]
 show_confidence_intervals_flag = True
 show_flag = False
 group1_categories = ['violin', 'drums', 'piano']
-legend_category = 'violin'
 
 
 def process_file(csv_filepath: str):
@@ -288,10 +287,11 @@ def process_file(csv_filepath: str):
             pyplot.xlabel('Lags', labelpad=10)
             pyplot.ylabel('MAE', labelpad=10)
 
+        ax = pyplot.gca()
+        handles, labels = ax.get_legend_handles_labels()
+
         pyplot.title(f'{category.capitalize()} - MAE', pad=20)  # Title
-        # Show legend only if the category is
-        if category == legend_category:
-            pyplot.legend(loc='upper right')  # Show legend
+
         if category in group1_categories:
             pyplot.ylim(0, 0.25)
         else:
@@ -304,6 +304,20 @@ def process_file(csv_filepath: str):
                            f'{category}-MAE.png'), dpi=300)  # Save figure
         
         pyplot.close()
+
+    # Save legend
+    ncol = 3
+
+    pyplot.figure(figsize=(15, 3))
+    pyplot.axis(False)
+    handles = [x for y in [handles[p::ncol] for p in range(ncol)] for x in y]
+    labels = [x for y in [labels[p::ncol] for p in range(ncol)] for x in y]
+    pyplot.gcf().set_tight_layout(True)
+    pyplot.legend(handles, labels, loc="center", bbox_to_anchor=(0.5, 0.5), mode="extend", ncol=ncol, prop={"size":20})
+    pyplot.savefig(path.join(plot_root_dir,
+                           f'legend.png'), dpi=300)
+    pyplot.close()
+        
 
     # Plot data grouped by category RMSE
     for category, elemets in mean_variance_by_categories.items():
@@ -338,8 +352,6 @@ def process_file(csv_filepath: str):
 
         pyplot.title(f'{category.capitalize()} - RMSE', pad=20)  # Title
         # Show legend only if the category is
-        if category == legend_category:
-            pyplot.legend(loc='upper right')  # Show legend
         if category in group1_categories:
             pyplot.ylim(0, 0.3)
         else:
@@ -416,6 +428,7 @@ def process_file(csv_filepath: str):
 if __name__ == '__main__':
     for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2023-02-21_double"), topdown=True):
         for name in files:
-            filepath = path.join(root, name)
-            print(path.relpath(filepath, path.abspath('.')))
-            process_file(filepath)
+            if(name.endswith('burg-basic-1675427060110.csv')):
+                filepath = path.join(root, name)
+                print(path.relpath(filepath, path.abspath('.')))
+                process_file(filepath)
