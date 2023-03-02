@@ -12,6 +12,7 @@ import csv
 
 specific_train_sizes = []  # [2048, 4096, 8192]
 show_confidence_intervals_flag = True
+show_multiplier_wrt_512_1 = False
 
 
 def get_algo(file_path: str):
@@ -58,7 +59,8 @@ def process_file(csv_filepath: str):
         # Loop thrugh lags
         for lag, values in lags.items():
             # Evaluate mean, variance and std for fit time
-            ar_fit_times = [x / 1e6 for x in values['ar_fit_time']] # Convert to ms
+            # Convert to ms
+            ar_fit_times = [x / 1e6 for x in values['ar_fit_time']]
             mean_fit_time = statistics.mean(ar_fit_times)
             variance_fit_time = statistics.variance(ar_fit_times)
             std_fit_time = statistics.stdev(ar_fit_times)
@@ -71,7 +73,8 @@ def process_file(csv_filepath: str):
             high_fit_time = mean_fit_time + interval_fit_time
 
             # Evaluate mean, variance and std for predict time
-            ar_predict_times = [x / 1e6 for x in values['ar_predict_time']] # Convert to ms
+            ar_predict_times = [
+                x / 1e6 for x in values['ar_predict_time']]  # Convert to ms
             mean_predict_time = statistics.mean(ar_predict_times)
             variance_predict_time = statistics.variance(ar_predict_times)
             std_predict_time = statistics.stdev(ar_predict_times)
@@ -111,29 +114,34 @@ def process_file(csv_filepath: str):
     return mean_variance_time
 
 
-flat_map = lambda f, xs: (y for ys in xs for y in f(ys))
+def flat_map(f, xs): return (y for ys in xs for y in f(ys))
+
 
 def process_aggregated_results(results: list):
     header = ['algo']
-    header.extend(list(flat_map(lambda el: list(map(lambda lagel: f'{el[0]}-{lagel[0]}', el[1].items())), results[0]['stats'].items())))
-    
+    header.extend(list(flat_map(lambda el: list(map(
+        lambda lagel: f'{el[0]}-{lagel[0]}', el[1].items())), results[0]['stats'].items())))
+
     makedirs(config.TIME_STATS_DIR, exist_ok=True)
 
     with open(path.join(config.TIME_STATS_DIR, 'fit_time.csv'), mode='w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=header)
         writer.writeheader()
         for result in results:
-            row = {x[0]: x[1] for x in list(flat_map(lambda x: x, [[(f'{el[0]}-{lagel[0]}',  f'{lagel[1]["mean_fit_time"]}±{lagel[1]["interval_fit_time"]}') for lagel in el[1].items()] for el in result['stats'].items()]))}
+            row = {x[0]: x[1] for x in list(flat_map(lambda x: x, [
+                                            [(f'{el[0]}-{lagel[0]}',  f'{lagel[1]["mean_fit_time"]}±{lagel[1]["interval_fit_time"]}') for lagel in el[1].items()] for el in result['stats'].items()]))}
             row['algo'] = result['algo']
             writer.writerow(row)
 
-    with open(path.join(config.TIME_STATS_DIR,'predict_time.csv'), mode='w') as csv_file:
+    with open(path.join(config.TIME_STATS_DIR, 'predict_time.csv'), mode='w') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=header)
         writer.writeheader()
         for result in results:
-            row = {x[0]: x[1] for x in list(flat_map(lambda x: x, [[(f'{el[0]}-{lagel[0]}',  f'{lagel[1]["mean_predict_time"]}±{lagel[1]["interval_predict_time"]}') for lagel in el[1].items()] for el in result['stats'].items()]))}
+            row = {x[0]: x[1] for x in list(flat_map(lambda x: x, [
+                                            [(f'{el[0]}-{lagel[0]}',  f'{lagel[1]["mean_predict_time"]}±{lagel[1]["interval_predict_time"]}') for lagel in el[1].items()] for el in result['stats'].items()]))}
             row['algo'] = result['algo']
             writer.writerow(row)
+
 
 if __name__ == '__main__':
     results = list()
@@ -143,6 +151,11 @@ if __name__ == '__main__':
             filepath = path.join(root, name)
             print(path.relpath(filepath, path.abspath('.')))
             stats = process_file(filepath)
+            if show_multiplier_wrt_512_1:
+                row = {x[0]: x[1] for x in list(flat_map(lambda x: x, [
+                                                [(f'{el[0]}-{lagel[0]}',  lagel[1]["mean_fit_time"]) for lagel in el[1].items()] for el in stats.items()]))}
+                for el in row.items():
+                    print(el[1] / row['512-1'])
             results.append({
                 'algo': algo,
                 'stats': stats
