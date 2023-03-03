@@ -398,24 +398,22 @@ def process_file(csv_filepath: str):
     pyplot.rc('font', size=16)
     pyplot.figure()
 
-    for train_size, stats in mean_variance_time.items():
-        # Filter on some train_size values if needed
-        if(specific_train_sizes != None and specific_train_sizes != [] and train_size not in specific_train_sizes):
-            continue
+    train_size = list(mean_variance_time.keys())[0]
+    stats = mean_variance_time[train_size]
 
-        # Plot with confidence intervals (error bars require the difference wrt to the mean => the interval)
-        pyplot.errorbar(x=[el for el in stats], y=[el['mean_predict_time'] for el in stats.values()], yerr=[[el['interval_predict_time'] for el in stats.values()], [el['interval_predict_time']
-                        for el in stats.values()]] if show_confidence_intervals_flag else None, marker='o', elinewidth=1, capsize=5, zorder=2, label="train_size="+str(train_size))
-        pyplot.xscale('log', base=2)  # Logaritmic x on base of 2
-        # Replace powers with actual values
-        pyplot.xticks(ticks=[el for el in stats],
-                        labels=[el for el in stats])
-        pyplot.xlabel('Lags', labelpad=10)
-        pyplot.ylabel('Time (ms)', labelpad=10)
+    # Plot with confidence intervals (error bars require the difference wrt to the mean => the interval)
+    pyplot.errorbar(x=[el for el in stats], y=[el['mean_predict_time'] for el in stats.values()], yerr=[[el['interval_predict_time'] for el in stats.values()], [el['interval_predict_time']
+                    for el in stats.values()]] if show_confidence_intervals_flag else None, marker='o', elinewidth=1, capsize=5, zorder=2, label="train_size="+str(train_size))
+    pyplot.xscale('log', base=2)  # Logaritmic x on base of 2
+    # Replace powers with actual values
+    pyplot.xticks(ticks=[el for el in stats],
+                    labels=[el for el in stats])
+    pyplot.xlabel('Lags', labelpad=10)
+    pyplot.ylabel('Time (ms)', labelpad=10)
 
     pyplot.title(f'AR predict time', pad=20)  # Title
     # Show legend only if the category is
-    pyplot.legend(loc='upper left')  # Show legend
+    # pyplot.legend(loc='upper left')  # Show legend
     pyplot.gcf().set_tight_layout(True)  # Make sure that text is not cut out
     if show_flag:
         pyplot.show()
@@ -428,7 +426,6 @@ def process_file(csv_filepath: str):
 if __name__ == '__main__':
     for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2023-02-21_double"), topdown=True):
         for name in files:
-            if(name.endswith('burg-basic-1675427060110.csv')):
-                filepath = path.join(root, name)
-                print(path.relpath(filepath, path.abspath('.')))
-                process_file(filepath)
+            filepath = path.join(root, name)
+            print(path.relpath(filepath, path.abspath('.')))
+            process_file(filepath)
