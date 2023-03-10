@@ -50,14 +50,14 @@ int main()
         uint32_t test_size = 128;
         std::vector<uint32_t> train_sizes{512, 1024, 2048, 4096, 8192};
         std::vector<uint32_t> lag_values{1, 2 , 4, 8, 16, 32, 64, 128};
-        uint32_t num_positions = 2;
+        uint32_t num_positions = 100;
 
         // seed rand
         stats::initialize_random(1);
 
         uint64_t index{};
 
-        for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert-all-1"))
+        for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert-all"))
         {
             if (entry.is_regular_file() && utils::string::tolower(entry.path().extension()).compare(".wav") == 0)
             {
