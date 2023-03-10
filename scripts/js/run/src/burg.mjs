@@ -55,33 +55,37 @@ burgCommand.action(async (options) => {
       run: './tmp_build/burg',
       clean: 'rm -r tmp_build',
     },
-    {
-      cmd_name: 'compensated-burg-basic',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_BASIC -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
-    {
-      cmd_name: 'compensated-burg-optimized-den',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_OPT_DEN -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
-    {
-      cmd_name: 'compensated-burg-optimized-den-sqrt',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_OPT_DEN_SQRT -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
+    ...(DATA_TYPE === 'DOUBLE'
+      ? [
+          {
+            cmd_name: 'compensated-burg-basic',
+            compile: [
+              `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_BASIC -DDATA_TYPE=${DATA_TYPE}`,
+              'cmake --build tmp_build --target burg -j 4',
+            ],
+            run: './tmp_build/burg',
+            clean: 'rm -r tmp_build',
+          },
+          {
+            cmd_name: 'compensated-burg-optimized-den',
+            compile: [
+              `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_OPT_DEN -DDATA_TYPE=${DATA_TYPE}`,
+              'cmake --build tmp_build --target burg -j 4',
+            ],
+            run: './tmp_build/burg',
+            clean: 'rm -r tmp_build',
+          },
+          {
+            cmd_name: 'compensated-burg-optimized-den-sqrt',
+            compile: [
+              `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DBURG=COMP_OPT_DEN_SQRT -DDATA_TYPE=${DATA_TYPE}`,
+              'cmake --build tmp_build --target burg -j 4',
+            ],
+            run: './tmp_build/burg',
+            clean: 'rm -r tmp_build',
+          },
+        ]
+      : []), // Error compensation is no needed for long doubles 
 
     // Fast math
     {
@@ -106,33 +110,6 @@ burgCommand.action(async (options) => {
       cmd_name: 'burg-optimized-den-sqrt-fast_math',
       compile: [
         `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DFAST_MATH=ON -DBURG=OPT_DEN_SQRT -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
-    {
-      cmd_name: 'compensated-burg-basic-fast_math',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DFAST_MATH=ON -DBURG=COMP_BASIC -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
-    {
-      cmd_name: 'compensated-burg-optimized-den-fast_math',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DFAST_MATH=ON -DBURG=COMP_OPT_DEN -DDATA_TYPE=${DATA_TYPE}`,
-        'cmake --build tmp_build --target burg -j 4',
-      ],
-      run: './tmp_build/burg',
-      clean: 'rm -r tmp_build',
-    },
-    {
-      cmd_name: 'compensated-burg-optimized-den-sqrt-fast_math',
-      compile: [
-        `cmake -B tmp_build -DCMAKE_BUILD_TYPE=Release -DFAST_MATH=ON -DBURG=COMP_OPT_DEN_SQRT -DDATA_TYPE=${DATA_TYPE}`,
         'cmake --build tmp_build --target burg -j 4',
       ],
       run: './tmp_build/burg',
