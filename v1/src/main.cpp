@@ -49,15 +49,15 @@ int main()
     {
         uint32_t test_size = 128;
         std::vector<uint32_t> train_sizes{512, 1024, 2048, 4096, 8192};
-        std::vector<uint32_t> lag_values{1, 2, 4, 8, 16, 32, 64, 128};
-        uint32_t num_positions = 100;
+        std::vector<uint32_t> lag_values{1, 2 , 4, 8, 16, 32, 64, 128};
+        uint32_t num_positions = 2;
 
         // seed rand
         stats::initialize_random(1);
 
         uint64_t index{};
 
-        for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert-all"))
+        for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert-all-1"))
         {
             if (entry.is_regular_file() && utils::string::tolower(entry.path().extension()).compare(".wav") == 0)
             {
@@ -121,6 +121,7 @@ int main()
                     {
                         std::vector<data_type> ar_mae;
                         std::vector<data_type> ar_rmse;
+                        std::vector<data_type> ar_err;
                         std::vector<double> ar_fit_time;
                         std::vector<double> ar_predict_time;
                         measure::timer ar_timer{};
@@ -133,9 +134,10 @@ int main()
 
                             ar ar_model{train_size};
                             ar_timer.start();
-                            auto a_coeff = ar_model.fit(train_set, lag);
+                            auto [a_coeff, err] = ar_model.fit(train_set, lag);
                             ar_timer.stop();
 
+                            ar_err.push_back(err);
                             ar_fit_time.push_back(ar_timer.get_duration_in_ns());
 
                             ar_timer.start();
@@ -157,6 +159,7 @@ int main()
                                                      {"lag", lag},
                                                      {"ar_mae", ar_mae},
                                                      {"ar_rmse", ar_rmse},
+                                                     {"ar_error", ar_err},
                                                      {"ar_fit_time", ar_fit_time},
                                                      {"ar_predict_time", ar_predict_time},
                                                      {"total_count", num_positions}});

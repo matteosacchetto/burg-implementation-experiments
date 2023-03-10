@@ -76,7 +76,7 @@ int main()
                 std::vector<data_type> test_set(samples.begin() + pos, samples.begin() + pos + test_size);
 
                 ar ar_model{train_size};
-                auto a_coeff = ar_model.fit(train_set, lag);
+                auto [a_coeff, err] = ar_model.fit(train_set, lag);
                 auto predictions = ar_model.predict(train_set, a_coeff, test_size);
 
                 std::vector<data_type> ar_ae = stats::ae(test_set, predictions);

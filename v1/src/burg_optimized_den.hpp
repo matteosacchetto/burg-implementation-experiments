@@ -54,7 +54,7 @@ public:
 #endif
     }
 
-    std::vector<T> fit(std::vector<T> &samples, std::size_t order)
+    std::pair<std::vector<T>, T> fit(std::vector<T> &samples, std::size_t order)
     {
 #ifdef DEBUG
         assert(order > 0);
@@ -109,7 +109,8 @@ public:
             num = -2 * la::prod::dot_basic(&b.data()[0], &f.data()[i], actual_size - i);
             den = (1 - ki * ki) * den - f[i - 1] * f[i - 1] - b[actual_size - i] * b[actual_size - i];
 
-            if(den == 0) {
+            if (den == 0)
+            {
                 den = std::numeric_limits<T>::epsilon();
             }
 
@@ -185,7 +186,7 @@ public:
 #endif
 
         // Return coefficients
-        return a;
+        return {a, err};
     }
 
     std::vector<T> predict(std::vector<T> &samples, std::vector<T> &a, std::size_t n)

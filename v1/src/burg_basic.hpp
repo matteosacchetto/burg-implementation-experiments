@@ -54,7 +54,7 @@ public:
 #endif
     }
 
-    std::vector<T> fit(std::vector<T>& samples, std::size_t order)
+    std::pair<std::vector<T>, T> fit(std::vector<T> &samples, std::size_t order)
     {
 #ifdef DEBUG
         assert(order > 0);
@@ -109,7 +109,8 @@ public:
             num = -2 * la::prod::dot_basic(&b.data()[0], &f.data()[i], actual_size - i);
             den = la::prod::dot_basic(&f.data()[i], &f.data()[i], actual_size - i) + la::prod::dot_basic(&b.data()[0], &b.data()[0], actual_size - i);
 
-            if(den == 0) {
+            if (den == 0)
+            {
                 den = std::numeric_limits<T>::epsilon();
             }
 
@@ -185,10 +186,10 @@ public:
 #endif
 
         // Return coefficients
-        return a;
+        return {a, err};
     }
 
-    std::vector<T> predict(std::vector<T>& samples, std::vector<T>& a, std::size_t n)
+    std::vector<T> predict(std::vector<T> &samples, std::vector<T> &a, std::size_t n)
     {
         std::vector<T> predictions(n);
         std::vector<T> section(a.size() - 1);
@@ -203,27 +204,27 @@ public:
             predictions[i] = la::prod::dot_basic(&section.data()[0], &a.data()[1], a.size() - 1);
         }
 
-        #ifdef DEBUG
+#ifdef DEBUG
+        {
+            std::stringstream s;
+
+            s << "[" << __FUNCTION__ << "] - "
+              << "BURG's AR predicted samples: "
+              << "\n"
+              << std::setprecision(type_precision<T>()) << std::scientific
+              << "  - predicted samples: [";
+
+            for (std::size_t i = 0; i < predictions.size(); ++i)
             {
-                std::stringstream s;
-
-                s << "[" << __FUNCTION__ << "] - "
-                << "BURG's AR predicted samples: "
-                << "\n"
-                << std::setprecision(type_precision<T>()) << std::scientific
-                << "  - predicted samples: [";
-
-                for (std::size_t i = 0; i < predictions.size(); ++i)
-                {
-                    s << (i > 0 ? ", " : "") << predictions[i];
-                }
-
-                s << "]" << std::endl;
-
-                logger::info(s.str(), sizeof(__FUNCTION__) + 2);
+                s << (i > 0 ? ", " : "") << predictions[i];
             }
 
-        #endif
+            s << "]" << std::endl;
+
+            logger::info(s.str(), sizeof(__FUNCTION__) + 2);
+        }
+
+#endif
 
         return predictions;
     }

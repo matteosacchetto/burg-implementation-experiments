@@ -54,7 +54,7 @@ public:
 #endif
     }
 
-    std::vector<T> fit(std::vector<T> &samples, std::size_t order)
+    std::pair<std::vector<T>, T> fit(std::vector<T> &samples, std::size_t order)
     {
 #ifdef DEBUG
         assert(order > 0);
@@ -91,10 +91,10 @@ public:
         a[0] = 1.; // As per burg's specifications
 
         // Initialize burg methods variables
-        T ki = 0.;    // K at i iteration
-        T num = 0.;   // Numerator
-        T den = 0.;   // Denominator
-        T err = 0.;   // Error
+        T ki = 0.;  // K at i iteration
+        T num = 0.; // Numerator
+        T den = 0.; // Denominator
+        T err = 0.; // Error
 
         err = precise_la::utils::sum_pair_elements(precise_la::prod::dot_2(&samples.data()[samples_start], &samples.data()[samples_start], actual_size));
         den = 2. * err;
@@ -116,10 +116,11 @@ public:
             // Denominator
             auto f_2 = precise_la::prod::two_product_FMA(f[i - 1], -f[i - 1]);
             auto b_2 = precise_la::prod::two_product_FMA(b[actual_size - i], -b[actual_size - i]);
-            auto den_1 = precise_la::prod::two_product_FMA(den, precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki))));
-            den =  precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(den_1, precise_la::utils::sum_pairs(f_2, b_2)));
+            auto den_1 = precise_la::prod::two_product_FMA(den, precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki))));
+            den = precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs(den_1, precise_la::utils::sum_pairs(f_2, b_2)));
 
-            if(den == 0) {
+            if (den == 0)
+            {
                 den = std::numeric_limits<T>::epsilon();
             }
 
@@ -130,8 +131,8 @@ public:
                 T bj = b[j - i];
                 T fj = f[j];
 
-                b[j - i] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({bj, 0}, precise_la::prod::two_product_FMA(ki, fj)));
-                f[j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({fj, 0}, precise_la::prod::two_product_FMA(ki, bj)));
+                b[j - i] = precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({bj, 0}, precise_la::prod::two_product_FMA(ki, fj)));
+                f[j] = precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({fj, 0}, precise_la::prod::two_product_FMA(ki, bj)));
             }
 
             for (std::size_t j = 1; j <= i / 2; j++)
@@ -139,12 +140,12 @@ public:
                 T aj = a[j];
                 T anj = a[i - j];
 
-                a[j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({aj, 0}, precise_la::prod::two_product_FMA(ki, anj)));
-                a[i - j] = precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({anj, 0}, precise_la::prod::two_product_FMA(ki, aj)));
+                a[j] = precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({aj, 0}, precise_la::prod::two_product_FMA(ki, anj)));
+                a[i - j] = precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({anj, 0}, precise_la::prod::two_product_FMA(ki, aj)));
             }
             a[i] = ki;
 
-            err = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(err, precise_la::utils::sum_pair_elements( precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki)))));
+            err = precise_la::utils::sum_pair_elements(precise_la::prod::two_product_FMA(err, precise_la::utils::sum_pair_elements(precise_la::utils::sum_pairs({1, 0}, precise_la::prod::two_product_FMA(ki, -ki)))));
 
 #ifdef DEBUG
             {
@@ -195,7 +196,7 @@ public:
 #endif
 
         // Return coefficients
-        return a;
+        return {a, err};
     }
 
     std::vector<T> predict(std::vector<T> &samples, std::vector<T> &a, std::size_t n)
