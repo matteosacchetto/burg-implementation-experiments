@@ -17,6 +17,15 @@ data_type = numpy.double
 num_pred = 2560
 specific_train_sizes = []
 
+names_to_names = {
+    'burg-basic': 'Burg\'s method',
+    'burg-optimized-den': 'Denominator optimization',
+    'burg-optimized-den-sqrt': 'Hybrid denominator',
+    'compensated-burg-basic': 'Burg\'s method (compensated)',
+    'compensated-burg-optimized-den': 'Den. opt. (compensated)',
+    'compensated-burg-optimized-den-sqrt': 'Hybrid den. (compensated)'
+}
+
 if not show_flag:
     use('Agg')
 
@@ -74,6 +83,7 @@ if __name__ == '__main__':
         makedirs(plot_root_dir, exist_ok=True)
 
     # Plot data grouped by category ERROR
+    it = 0
     for algo, elements in results.items():
         # Create a new figure
         pyplot.rc('font', size=16)
@@ -90,11 +100,14 @@ if __name__ == '__main__':
             # Replace powers with actual values
             pyplot.xticks(ticks=[el for el in stats],
                           labels=[el for el in stats])
-            pyplot.xlabel('Lags', labelpad=10)
-            pyplot.ylabel('Error', labelpad=10)
+            pyplot.xlabel('Order', labelpad=10)
+            pyplot.ylabel('MAE', labelpad=10)
 
-        pyplot.title(f'{algo.capitalize()} - Prediction error', pad=20)  # Title
-        pyplot.ylim([-0.1, 0.7])
+        ax = pyplot.gca()
+        handles, labels = ax.get_legend_handles_labels()
+
+        pyplot.title(f'{names_to_names[algo] if algo in names_to_names else algo}', pad=20)  # Title
+        pyplot.ylim([-0.05, 0.65])
         # Show legend only if the category is
         pyplot.gcf().set_tight_layout(True)  # Make sure that text is not cut out
         if show_flag:
@@ -103,3 +116,19 @@ if __name__ == '__main__':
             pyplot.savefig(path.join(plot_root_dir, f'{algo}-pe.png'), dpi=300)  # Save figure
         
         pyplot.close()
+
+        if(it == 0):
+            # Save legend
+            ncol = 3
+
+            pyplot.figure(figsize=(15, 3))
+            pyplot.axis(False)
+            handles = [x for y in [handles[p::ncol] for p in range(ncol)] for x in y]
+            labels = [x for y in [labels[p::ncol] for p in range(ncol)] for x in y]
+            pyplot.gcf().set_tight_layout(True)
+            pyplot.legend(handles, labels, loc="center", bbox_to_anchor=(0.5, 0.5), mode="extend", ncol=ncol, prop={"size":20})
+            pyplot.savefig(path.join(plot_root_dir,
+                                f'legend.png'), dpi=300)
+            pyplot.close()
+        
+        it+=1
