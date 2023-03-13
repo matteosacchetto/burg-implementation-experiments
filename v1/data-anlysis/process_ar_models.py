@@ -284,7 +284,7 @@ def process_file(csv_filepath: str):
             # Replace powers with actual values
             pyplot.xticks(ticks=[el for el in stats],
                           labels=[el for el in stats])
-            pyplot.xlabel('Lags', labelpad=10)
+            pyplot.xlabel('Order', labelpad=10)
             pyplot.ylabel('MAE', labelpad=10)
 
         ax = pyplot.gca()
@@ -347,7 +347,7 @@ def process_file(csv_filepath: str):
             # Replace powers with actual values
             pyplot.xticks(ticks=[el for el in stats],
                           labels=[el for el in stats])
-            pyplot.xlabel('Lags', labelpad=10)
+            pyplot.xlabel('Order', labelpad=10)
             pyplot.ylabel('RMSE', labelpad=10)
 
         pyplot.title(f'{category.capitalize()} - RMSE', pad=20)  # Title
@@ -380,7 +380,7 @@ def process_file(csv_filepath: str):
         # Replace powers with actual values
         pyplot.xticks(ticks=[el for el in stats],
                         labels=[el for el in stats])
-        pyplot.xlabel('Lags', labelpad=10)
+        pyplot.xlabel('Order', labelpad=10)
         pyplot.ylabel('Time (ms)', labelpad=10)
 
     pyplot.title(f'AR fit time', pad=20)  # Title
@@ -408,7 +408,7 @@ def process_file(csv_filepath: str):
     # Replace powers with actual values
     pyplot.xticks(ticks=[el for el in stats],
                     labels=[el for el in stats])
-    pyplot.xlabel('Lags', labelpad=10)
+    pyplot.xlabel('Order', labelpad=10)
     pyplot.ylabel('Time (ms)', labelpad=10)
 
     pyplot.title(f'AR predict time', pad=20)  # Title
