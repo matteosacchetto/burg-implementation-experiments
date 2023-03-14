@@ -145,7 +145,7 @@ def process_aggregated_results(results: list):
 
 if __name__ == '__main__':
     results = list()
-    for (root, dirs, files) in walk(path.join(config.ROOT_DIR, "results-2023-02-21_double"), topdown=True):
+    for (root, dirs, files) in walk(path.join(config.ROOT_DIR, "results-2023-03-14_double"), topdown=True):
         for name in files:
             algo = get_algo(name)
             filepath = path.join(root, name)

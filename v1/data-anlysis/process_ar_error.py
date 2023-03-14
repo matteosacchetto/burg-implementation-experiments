@@ -15,6 +15,15 @@ import numpy
 show_flag = False
 data_type = numpy.double
 
+names_to_names = {
+    'burg-basic': 'Burg\'s method',
+    'burg-optimized-den': 'Denominator optimization',
+    'burg-optimized-den-sqrt': 'Hybrid denominator',
+    'compensated-burg-basic': 'Burg\'s method (compensated)',
+    'compensated-burg-optimized-den': 'Den. opt. (compensated)',
+    'compensated-burg-optimized-den-sqrt': 'Hybrid den. (compensated)'
+}
+
 def process_file(filepath: str):
     algo = '-'.join(path.splitext(path.basename(filepath))[0].split('-')[0:-1])
     if not show_flag:
@@ -36,7 +45,9 @@ def process_file(filepath: str):
             pyplot.figure(figsize=(10, 6))
             pyplot.plot(range(len(ar_predictions)), ar_predictions)
             pyplot.ylim(-1.5, 1.5)
-            pyplot.title(f'{algo} {train_size}-{order}', pad=20)  # Title
+            pyplot.title(f'{names_to_names[algo] if algo in names_to_names else algo} {train_size}-{order}', pad=20)  # Title
+            pyplot.xlabel('Sample', labelpad=10)
+            pyplot.ylabel('Gain', labelpad=10)
 
             pyplot.gcf().set_tight_layout(True)  # Make sure that text is not cut out
             if show_flag:
@@ -48,7 +59,7 @@ def process_file(filepath: str):
 
 
 if __name__ == '__main__':
-    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2205"), topdown=True):
+    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2000_double-2"), topdown=True):
         for name in files:
             filepath = path.join(root, name)
             print(path.relpath(filepath, path.abspath('.')))
