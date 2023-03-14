@@ -65,7 +65,7 @@ public:
         std::size_t actual_size = std::min(samples.size(), max_size);
         std::size_t samples_start = samples.size() - actual_size;
         std::size_t actual_order = std::min(order, max_order);
-        std::size_t switching_point = std::sqrt(actual_order + 1);
+        std::size_t switching_point = std::max((std::size_t) std::sqrt(actual_order), 8UL);
 
 #ifdef DEBUG
         {
