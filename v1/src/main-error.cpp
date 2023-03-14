@@ -54,7 +54,7 @@ int main()
         uint32_t pos = max_train_size; // Have each model predict starting from the same position
         uint64_t size = max_train_size + test_size;
 
-        data_type frequency = 2205;
+        data_type frequency = 2000;
         data_type sample_rate = 44100;
         std::vector<data_type> samples(size);
 
