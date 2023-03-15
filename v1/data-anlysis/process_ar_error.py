@@ -59,7 +59,7 @@ def process_file(filepath: str):
 
 
 if __name__ == '__main__':
-    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2000_double-2"), topdown=True):
+    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-long-predictions_double"), topdown=True):
         for name in files:
             filepath = path.join(root, name)
             print(path.relpath(filepath, path.abspath('.')))

@@ -133,7 +133,7 @@ def process_file(csv_filepath: str):
 
 
 if __name__ == '__main__':
-    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-2023-03-10_double"), topdown=True):
+    for (root,dirs,files) in walk(path.join(config.ROOT_DIR, "results-dataset_double"), topdown=True):
         for name in files:
             filepath = path.join(root, name)
             print(path.relpath(filepath, path.abspath('.')))
