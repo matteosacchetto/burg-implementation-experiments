@@ -6,3 +6,5 @@ results*
 plots*
 tmp*/
 time_stats*/
+
+m*.json
