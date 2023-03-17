@@ -13,7 +13,7 @@ These files are provided here, and have been used JUST for research purposes (ed
 The aforementioned research purposes did generate any revenue, thus the use was in line with the aformentioned license.
 
 Misuse of these files for reasons which violate the above licenses is NOT ALLOWED.
-If for any reason, you find that the author violate the above terms or you do not want these files to be available here, please contact me as soon as possible at matteo.sacchetto@polito.it 
+If for any reason, you find that the author violated the above terms or you do not want the files to be available here, please contact the author as soon as possible at matteo.sacchetto@polito.it
 
 Links to the files:
 - https://freesound.org/people/musical_genie47/downloaded_sounds/?page=1#sound
