@@ -57,7 +57,7 @@ int main()
 
         uint64_t index{};
 
-        for (const auto &entry : std::filesystem::recursive_directory_iterator("samples-convert-all"))
+        for (const auto &entry : std::filesystem::recursive_directory_iterator("dataset"))
         {
             if (entry.is_regular_file() && utils::string::tolower(entry.path().extension()).compare(".wav") == 0)
             {
