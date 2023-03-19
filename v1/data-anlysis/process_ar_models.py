@@ -290,7 +290,7 @@ def process_file(csv_filepath: str):
         ax = pyplot.gca()
         handles, labels = ax.get_legend_handles_labels()
 
-        pyplot.title(f'{category.capitalize()} - MAE', pad=20)  # Title
+        # pyplot.title(f'{category.capitalize()} - MAE', pad=20)  # Title
 
         if category in group1_categories:
             pyplot.ylim(0, 0.25)
@@ -306,7 +306,7 @@ def process_file(csv_filepath: str):
         pyplot.close()
 
     # Save legend
-    ncol = 3
+    ncol = 2
 
     pyplot.figure(figsize=(15, 3))
     pyplot.axis(False)
@@ -350,7 +350,7 @@ def process_file(csv_filepath: str):
             pyplot.xlabel('Order', labelpad=10)
             pyplot.ylabel('RMSE', labelpad=10)
 
-        pyplot.title(f'{category.capitalize()} - RMSE', pad=20)  # Title
+        # pyplot.title(f'{category.capitalize()} - RMSE', pad=20)  # Title
         # Show legend only if the category is
         if category in group1_categories:
             pyplot.ylim(0, 0.3)

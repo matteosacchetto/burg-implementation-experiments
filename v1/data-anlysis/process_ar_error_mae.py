@@ -106,7 +106,7 @@ if __name__ == '__main__':
         ax = pyplot.gca()
         handles, labels = ax.get_legend_handles_labels()
 
-        pyplot.title(f'{names_to_names[algo] if algo in names_to_names else algo}', pad=20)  # Title
+        # pyplot.title(f'{names_to_names[algo] if algo in names_to_names else algo}', pad=20)  # Title
         pyplot.ylim([-0.05, 0.65])
         # Show legend only if the category is
         pyplot.gcf().set_tight_layout(True)  # Make sure that text is not cut out
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         if(it == 0):
             # Save legend
-            ncol = 3
+            ncol = 2
 
             pyplot.figure(figsize=(15, 3))
             pyplot.axis(False)
