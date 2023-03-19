@@ -11,4 +11,4 @@ To run everythin in this repo you need
 - `python3`
 - `node`
 
-If you have any issue with anythin in this repo or want to have clarifications on how to compile/run tests, please open a issue.
+If you have any issue with anything in this repo or want to have clarifications on how to compile/run tests, please open a issue.
