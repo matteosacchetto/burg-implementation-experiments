@@ -1,0 +1,10 @@
+# VSCode files
+.vscode
+
+# Reults
+results*
+plots*
+tmp*/
+time_stats*/
+
+m*.json
