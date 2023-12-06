@@ -21,27 +21,39 @@
 
 #if defined(USE_DOUBLE)
 using data_type = double;
+#define TYPE_NAME "double"
 #elif defined(USE_LONG_DOUBLE)
 using data_type = long double;
+#define TYPE_NAME "long_double"
 #else
 using data_type = double;
+#define TYPE_NAME "double"
 #endif
 
 #if defined(BURG_BASIC)
 using ar = burg_basic<data_type>;
+#define NAME "burg_basic"
 #elif defined(BURG_OPT_DEN)
 using ar = burg_optimized_den<data_type>;
+#define NAME "burg_optimized_den"
 #elif defined(BURG_OPT_DEN_SQRT)
 using ar = burg_optimized_den_sqrt<data_type>;
+#define NAME "burg_optimized_den_sqrt"
 #elif defined(BURG_COMP_BASIC)
 using ar = compensated_burg_basic<data_type>;
+#define NAME "compensated_burg_basic"
 #elif defined(BURG_COMP_OPT_DEN)
 using ar = compensated_burg_optimized_den<data_type>;
+#define NAME "compensated_burg_optimized_den"
 #elif defined(BURG_COMP_OPT_DEN_SQRT)
 using ar = compensated_burg_optimized_den_sqrt<data_type>;
+#define NAME "compensated_burg_optimized_den_sqrt"
 #else
 using ar = burg_basic<data_type>;
+#define NAME "burg_basic"
 #endif
+
+#define DIR_NAME(x) (x "-" NAME "_" TYPE_NAME)
 
 int main()
 {
@@ -51,6 +63,11 @@ int main()
         std::vector<uint32_t> train_sizes{512, 1024, 2048, 4096, 8192};
         std::vector<uint32_t> lag_values{1, 2 , 4, 8, 16, 32, 64, 128};
         uint32_t num_positions = 100;
+
+#ifdef SAVE_FILE
+        uint32_t selected_train_size = 2048;
+        uint32_t selected_lag_value = 128; 
+#endif
 
         // seed rand
         stats::initialize_random(1);
@@ -63,20 +80,21 @@ int main()
             {
                 const std::string filepath = entry.path();
 #ifdef SAVE_FILE
-                std::string processed_filepath = utils::string::change_first_dir(entry.path(), "samples-convert-processed");
+                std::string processed_filepath = utils::string::change_first_dir(entry.path(), DIR_NAME("dataset-processed"));
 #endif
 
                 logger::info(filepath);
-
-#ifdef SAVE_FILE
-                logger::info(processed_filepath);
-#endif
 
                 wav_file<data_type> wav{filepath};
                 wav.read_file();
 
                 std::vector<data_type> samples = wav.data_samples[0];
+
+#ifdef SAVE_FILE
                 std::vector<data_type> processed_samples(wav.data_samples[0]);
+                std::vector<data_type> processed_samples_silence(wav.data_samples[0]);
+                std::vector<data_type> processed_samples_previous(wav.data_samples[0]);
+#endif
 
                 std::vector<uint64_t> positions = stats::get_n_positions<uint64_t>(*std::max_element(train_sizes.begin(), train_sizes.end()), samples.size() - test_size, num_positions, test_size);
 
@@ -111,6 +129,11 @@ int main()
 
                     data_type b1_rmse = stats::rmse(test_set, previous_packet);
                     result["b1"]["rmse"].push_back(b1_rmse);
+
+#ifdef SAVE_FILE
+                    std::copy(silence.begin(), silence.end(), processed_samples_silence.begin() + pos);
+                    std::copy(previous_packet.begin(), previous_packet.end(), processed_samples_previous.begin() + pos);
+#endif
                 }
 
                 // For each train size
@@ -146,7 +169,11 @@ int main()
 
                             ar_predict_time.push_back(ar_timer.get_duration_in_ns());
 
-                            std::copy(predictions.begin(), predictions.end(), processed_samples.begin() + pos);
+#ifdef SAVE_FILE
+                            if(train_size == selected_train_size && lag == selected_lag_value) {
+                                std::copy(predictions.begin(), predictions.end(), processed_samples.begin() + pos);
+                            }
+#endif
 
                             data_type predictions_mae = stats::mae(test_set, predictions);
                             ar_mae.push_back(predictions_mae);
@@ -186,8 +213,20 @@ int main()
                     std::filesystem::create_directories(processed_path.parent_path());
                 }
 
-                wav_file<double> processed_wav{processed_filepath};
-                processed_wav.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
+                const auto processed_filepath_ar = utils::string::rename_append_suffix(processed_filepath, "ar_"+std::to_string(selected_train_size)+"_"+std::to_string(selected_lag_value));
+                wav_file<double> processed_wav_ar{processed_filepath_ar};
+                processed_wav_ar.write_file(std::vector<std::vector<double>>{processed_samples}, wav.sample_rate, wav.sample_type);
+                logger::info(processed_filepath_ar);
+
+                const auto processed_filepath_silence = utils::string::rename_append_suffix(processed_filepath, "silence");
+                wav_file<double> processed_wav_silence{processed_filepath_silence};
+                processed_wav_silence.write_file(std::vector<std::vector<double>>{processed_samples_silence}, wav.sample_rate, wav.sample_type);
+                logger::info(processed_filepath_silence);
+
+                const auto processed_filepath_previous = utils::string::rename_append_suffix(processed_filepath, "previous");
+                wav_file<double> processed_wav_previous{processed_filepath_previous};
+                processed_wav_previous.write_file(std::vector<std::vector<double>>{processed_samples_previous}, wav.sample_rate, wav.sample_type);
+                logger::info(processed_filepath_previous);
 #endif
             }
         }

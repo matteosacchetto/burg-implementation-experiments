@@ -71,6 +71,17 @@ namespace utils
 
             return output.str();
         }
+
+        inline const std::string rename_append_suffix(const std::string& filepath, const std::string& suffix) {
+            std::filesystem::path fullpath{filepath};
+
+            std::string stem = fullpath.stem();
+            std::string extension = fullpath.extension();
+
+            fullpath.replace_filename(stem+"_"+suffix+extension);
+
+            return fullpath.string();
+        }
     }
 
     namespace io
