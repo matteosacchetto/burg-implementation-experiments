@@ -92,6 +92,11 @@ else()
   message("-- Using BURG basic implementation")
 endif()
 
+if(SAVE_FILE)
+  message("-- Enabled saving the output wav files")
+  add_definitions(-DSAVE_FILE)
+endif()
+
 # [[ Build executable ]]
 # Add the executable
 add_executable(${PROJECT_NAME} src/main.cpp src/timer.cpp src/tty.cpp)
